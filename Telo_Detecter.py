@@ -4,6 +4,7 @@ from scipy.special import logsumexp
 from Seq import *
 from Bio.SeqIO import parse
 import os
+import sys
 
 FASTQ_PATH = '../fastq'
 
@@ -300,6 +301,9 @@ def main(fastq_files_path):
                                              p_exit_from_motif_to_backgroud=0.15, p_telo_background_to_motif=0.7)
 
     for filename in os.listdir(fastq_files_path):
+        file_num = int(filename.split("_")[1].split(".")[0])
+        if not (int(sys.argv[1]) <= file_num < int(sys.argv[2])):
+            continue
         path = os.path.join(fastq_files_path, filename)
         print(path)
         seqs = parse_seqs(path)
