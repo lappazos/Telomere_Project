@@ -189,7 +189,7 @@ class Seq:
     def add_telo_background(self, base, position):
         if not isinstance(self.seq[-1], Telomere):
             self.add_telomere()
-        self.seq[-1].add_backgroud_base(base)
+        self.seq[-1].add_background_base(base)
         if self.telo_start is None:
             self.telo_start = position
 

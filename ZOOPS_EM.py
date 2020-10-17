@@ -211,7 +211,7 @@ def EM(emissions_mat, transitions_mat, sequences, threshold, k_counter,seeds):
         logsum8 = logsumexp(N_kl[8, :])
         p_same_motif_block = N_kl[8,3]-logsum8
         p_exit_from_motif_to_backgroud = N_kl[8,2]-logsum8
-        transition_mat = mf.build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=np.exp(p_enter_telo_from_background),
+        transitions_mat = mf.build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=np.exp(p_enter_telo_from_background),
                                                  p_exit_telo=np.exp(p_exit_telo),
                                                  p_end_of_seq=0.00005, prob_for_primary_motif=np.exp(prob_for_primary_motif),
                                                  p_same_motif_block=np.exp(p_same_motif_block),
