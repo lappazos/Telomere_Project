@@ -300,10 +300,16 @@ def main(fastq_files_path):
                                              p_same_motif_block=0.75,
                                              p_exit_from_motif_to_backgroud=0.15, p_telo_background_to_motif=0.7)
 
+    files_visited = []
+
     for filename in os.listdir(fastq_files_path):
         file_num = int(filename.split("_")[1].split(".")[0])
         if not (int(sys.argv[1]) <= file_num < int(sys.argv[2])):
             continue
+        files_visited.append(filename)
+        with open(sys.argv[1] + "_" + sys.argv[2] + '.txt', 'w') as file_handler:
+            for item in files_visited:
+                file_handler.write("%s\n" % item)
         path = os.path.join(fastq_files_path, filename)
         print(path)
         seqs = parse_seqs(path)
