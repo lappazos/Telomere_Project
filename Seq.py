@@ -167,17 +167,14 @@ class Seq:
         self.longest_telomere_len = 0
         self.motif_dict = {}
 
-    def add_next_telo(self):
-        self.next_telo = Telomere()
+    def add_telomere(self):
+        if self.next_telo is None:
+            self.next_telo = Telomere()
+        self.seq.append(self.next_telo)
+        self.next_telo = None
         if self.contain_telo:
             self.more_then_one_telo = True
         self.contain_telo = True
-
-    def add_telomere(self):
-        if self.next_telo is None:
-            self.add_next_telo()
-        self.seq.append(self.next_telo)
-        self.next_telo = None
 
     def add_motif_base(self, motif_type, base_tuple, position):
         if not isinstance(self.seq[-1], Telomere):
@@ -198,7 +195,7 @@ class Seq:
 
     def add_pre_telo(self, base_tuple):
         if self.next_telo is None:
-            self.add_next_telo()
+            self.next_telo = Telomere()
         self.seq.append(base_tuple[0])
 
     def print_statistics(self, doc=None, counter=None):

@@ -283,7 +283,13 @@ def wrap_log(to_wrap):
 def parse_seqs(fasta_path):
     sequences = []
     file = open(fasta_path, 'r')
-    for seq in parse(file, format='fastq'):
+    try:
+        parsed_seqs = parse(file, format='fastq')
+    except ValueError as err:
+        msg = 'File '+fasta_path + ' - ' + str(err)
+        print("\033[1;31m" + msg + '\033[0m')
+        return sequences
+    for seq in parsed_seqs:
         sequences.append((seq.id, START_SIGN + seq.seq._data + END_SIGN))
     file.close()
     return sequences
@@ -306,13 +312,15 @@ def main(fastq_files_path):
         file_num = int(filename.split("_")[1].split(".")[0])
         if not (int(sys.argv[1]) <= file_num < int(sys.argv[2])):
             continue
+        path = os.path.join(fastq_files_path, filename)
+        print(path)
+        seqs = parse_seqs(path)
+        if not seqs:
+            continue
         files_visited.append(filename)
         with open(sys.argv[1] + "_" + sys.argv[2] + '.txt', 'w') as file_handler:
             for item in files_visited:
                 file_handler.write("%s\n" % item)
-        path = os.path.join(fastq_files_path, filename)
-        print(path)
-        seqs = parse_seqs(path)
         print('len' + str(len(seqs)))
         for value, seq in enumerate(seqs):
             posterior(seq[1], emission_mat, transition_mat, k_counter, seeds, seq[0], value)
