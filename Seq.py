@@ -1,5 +1,5 @@
-# from docx import Document
-# from docx.enum.text import WD_COLOR_INDEX
+from docx import Document
+from docx.enum.text import WD_COLOR_INDEX
 import pickle
 
 FILE_NAME_PREFIX = 'serialized_telo\\'
@@ -49,17 +49,17 @@ class Motif:
 
 class TTAGGG(Motif):
     seq = 'TTAGGG'
-    # color = WD_COLOR_INDEX.YELLOW
+    color = WD_COLOR_INDEX.YELLOW
 
 
 class TTAAAA(Motif):
     seq = 'TTAAAA'
-    # color = WD_COLOR_INDEX.RED
+    color = WD_COLOR_INDEX.RED
 
 
 class TTGGGG(Motif):
     seq = 'TTGGGG'
-    # color = WD_COLOR_INDEX.BRIGHT_GREEN
+    color = WD_COLOR_INDEX.BRIGHT_GREEN
 
 
 class Telomere:
@@ -231,16 +231,16 @@ class Seq:
                 self.num_of_motifs_errors += elem.num_of_motifs_errors
                 self.num_of_motifs += elem.num_of_motifs
 
-    # def print_doc(self):
-    #     document = Document()
-    #     doc = document.add_paragraph('')
-    #     self.print_statistics(doc)
-    #     for elem in self.seq:
-    #         if isinstance(elem, Telomere):
-    #             elem.print_doc(doc)
-    #         else:
-    #             doc.add_run(elem)
-    #     document.save(self.rec_num + '.docx')
+    def print_doc(self):
+        document = Document()
+        doc = document.add_paragraph('')
+        self.print_statistics(doc)
+        for elem in self.seq:
+            if isinstance(elem, Telomere):
+                elem.print_doc(doc)
+            else:
+                doc.add_run(elem)
+        document.save(self.rec_num + '.docx')
 
     def generate_seq(self):
         if self.sequence:

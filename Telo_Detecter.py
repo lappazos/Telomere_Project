@@ -285,14 +285,14 @@ def parse_seqs(fasta_path):
     file = open(fasta_path, 'r')
     try:
         parsed_seqs = parse(file, format='fastq')
+        for seq in parsed_seqs:
+            sequences.append((seq.id, START_SIGN + seq.seq._data + END_SIGN))
     except ValueError as err:
         msg = 'File '+fasta_path + ' - ' + str(err)
         print("\033[1;31m" + msg + '\033[0m')
+    finally:
+        file.close()
         return sequences
-    for seq in parsed_seqs:
-        sequences.append((seq.id, START_SIGN + seq.seq._data + END_SIGN))
-    file.close()
-    return sequences
 
 
 def main(fastq_files_path):
