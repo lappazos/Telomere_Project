@@ -3,9 +3,7 @@
 # get the alignment dictionary, and match the different alignments to chromosome location.
 
 import mappy as mp
-import pickle
 import Seq
-import os
 
 from Bio import Entrez
 
@@ -45,8 +43,8 @@ def chromosome_matcher(hit, chromo_dict):
     handle.close()
 
 
-def align_to_chromosomes(path):
-    aligner = mp.Aligner('GRCh38_latest_genomic.fna.gz', preset='map-ont')
+def align_to_chromosomes(teloes):
+    aligner = mp.Aligner('../../GRCh38_latest_genomic.fna.gz', preset='map-ont')
     if not aligner: raise Exception("ERROR: failed to load/build index")
 
     chromosome_dict = {}
@@ -55,16 +53,11 @@ def align_to_chromosomes(path):
     chromosome_dict["X"] = [0, 0, 0]
     chromosome_dict["Y"] = [0, 0, 0]
 
-    for filename in os.listdir(path):
-        file = open(os.path.join(path, filename), 'rb')
-        telo = pickle.load(file)
-        if not isinstance(telo, Seq.Seq):
-            continue
-        telo.generate_seq()
-        print(filename)
+    for telo in teloes:
+        print(telo.rec_num)
         aligns_dict = {}
         for to_align in telo.non_telomeric_parts:
-            if len(to_align < MIN_ALIGNMENT_LENGTH):
+            if len(to_align) < MIN_ALIGNMENT_LENGTH:
                 continue
             for hit in aligner.map(to_align):
                 if hit.is_primary:

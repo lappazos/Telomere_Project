@@ -1,9 +1,7 @@
 # get telo objects, align them, and check their location compared to the reference
 
 import mappy as mp
-import pickle
 import Seq
-import os
 
 SEQ_EDGE = 20
 
@@ -12,17 +10,7 @@ MAX_ALIGN_ERR = 0.1
 MIN_ALIGN_LEN = 1000
 
 
-def alignment_between_telos(path):
-    telos = []
-
-    for filename in os.listdir(path):
-        file = open(os.path.join(path, filename), 'rb')
-        telo = pickle.load(file)
-        if not isinstance(telo, Seq.Seq):
-            continue
-        telo.generate_seq()
-        telos.append(telo)
-        file.close()
+def alignment_between_telos(telos):
 
     for index, telo in enumerate(telos):
         print(telo.rec_num)

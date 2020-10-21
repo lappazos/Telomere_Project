@@ -270,6 +270,7 @@ class Seq:
 
     def save_to_file(self):
         if self.contain_telo:
+            self.generate_seq()
             file_handler = open(FILE_NAME_PREFIX + self.rec_num + '.obj', 'wb')
             pickle.dump(self, file_handler)
             file_handler.close()
