@@ -300,11 +300,11 @@ def main(fastq_files_path):
     seeds = ['TTAGGG', 'TTAAAA', 'TTGGGG']
 
     emission_mat, k_counter = initial_emissions_mat_calc(seeds, alpha=(0.08 / 3))
-    transition_mat = build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=0.45,
+    transition_mat = build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=0.1,
                                              p_exit_telo=0.0002,
-                                             p_end_of_seq=0.00005, prob_for_primary_motif=0.86,
-                                             p_same_motif_block=0.75,
-                                             p_exit_from_motif_to_backgroud=0.15, p_telo_background_to_motif=0.7)
+                                             p_end_of_seq=0.00005, prob_for_primary_motif=0.8,
+                                             p_same_motif_block=0.65,
+                                             p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
 
     files_visited = []
 

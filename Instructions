@@ -1,0 +1,16 @@
+* Connect to cluster - ssh phoenix-gw
+
+* Reach folder with fastq - cd /cs/labs/tommy/lioraryepaz/Telomere_Data/Dox_Minus
+
+* Open virtual env for missing packages installations - https://wiki.cs.huji.ac.il/wiki/Python#virtualenv
+
+* Activate Telo Detecter - sbatch --mem=8g -c1 --time:15:0:0 --wrap 'python3 Telomere_Project/Telo_Detecter.py begin_index end_index'
+
+* Option to divide to sub-tasks, file Execute_Run.py
+
+* Option to activate ZOOPS_EM to improve probabilities
+
+* Activate Telo Analyzer - sbatch --mem=8g --time:10:0:0 --wrap 'python3 Telomere_Project/Telo_Analyzer.py'
+
+
+** Queue line could be queried with - squeue -u lioraryepaz

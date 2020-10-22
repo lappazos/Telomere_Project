@@ -7,6 +7,8 @@ import Seq
 
 from Bio import Entrez
 
+NUM_CHROMOSOMES = 22
+
 UNKNOWN_INDEX = 0
 
 END_INDEX = 2
@@ -23,14 +25,13 @@ MIN_ALIGNMENT_LENGTH = 50
 
 
 def chromosome_matcher(hit, chromo_dict):
-    print(hit.ctg)
     handle = Entrez.efetch(db="nucleotide", id=hit.ctg, rettype="gb", retmode="text")
     lines = handle.readlines()
     chromosome = lines[1].split("chromosome ")[1].split(", ")[0].split(" ")[0]
+    print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en) + " : " + str(chromosome))
     chr_len = int(lines[0].split(" bp")[0].split(" ")[-1])
     if ('scaffold' in lines[1]) or ('patch' in lines[1]):
-        chromo_dict[chromosome][0] += 1
-        print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en))
+        chromo_dict[chromosome][UNKNOWN_INDEX] += 1
         return
     elif hit.r_st < chr_len * CHR_BEGIN:
         chromo_dict[chromosome][BEGIN_INDEX] += 1
@@ -39,7 +40,6 @@ def chromosome_matcher(hit, chromo_dict):
         chromo_dict[chromosome][END_INDEX] += 1
         return
     chromo_dict[chromosome][UNKNOWN_INDEX] += 1
-    print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en))
     handle.close()
 
 
@@ -48,7 +48,7 @@ def align_to_chromosomes(teloes):
     if not aligner: raise Exception("ERROR: failed to load/build index")
 
     chromosome_dict = {}
-    for i in range(1, 22):
+    for i in range(1, NUM_CHROMOSOMES + 1):
         chromosome_dict[str(i)] = [0, 0, 0]
     chromosome_dict["X"] = [0, 0, 0]
     chromosome_dict["Y"] = [0, 0, 0]

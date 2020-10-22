@@ -94,12 +94,6 @@ class Telomere:
         self.seq.append(base)
 
     def print_statistics(self, doc=None):
-        if not self.num_of_motifs_errors:
-            self.num_of_motifs_errors = 0
-            for elem in self.seq:
-                if isinstance(elem, Motif):
-                    if elem.base_error or elem.motif_error:
-                        self.num_of_motifs_errors += 1
         if self.num_of_motifs > 0:
             if doc:
                 doc.add_run(" motif error rate: %.2f" % (self.num_of_motifs_errors / self.num_of_motifs) + "\n")
@@ -114,12 +108,6 @@ class Telomere:
             doc.add_run(" num of motifs:" + str(self.num_of_motifs) + "\n")
         else:
             print(" num of motifs:" + str(self.num_of_motifs))
-        for elem in range(len(self.motif_types_num)):
-            if self.motif_types_num[elem] > 0:
-                percentage = round(self.motif_types_num[elem] / self.num_of_motifs, 2)
-            else:
-                percentage = 0
-            self.motif_types_num[elem] = percentage
         if doc:
             doc.add_run(" motif types division: " + str(self.motif_types_num) + "\n")
         else:
@@ -147,6 +135,18 @@ class Telomere:
             else:
                 self.sequence += motif
         self.len = len(self.sequence)
+        for elem in range(len(self.motif_types_num)):
+            if self.motif_types_num[elem] > 0:
+                percentage = round(self.motif_types_num[elem] / self.num_of_motifs, 2)
+            else:
+                percentage = 0
+            self.motif_types_num[elem] = percentage
+        if not self.num_of_motifs_errors:
+            self.num_of_motifs_errors = 0
+            for elem in self.seq:
+                if isinstance(elem, Motif):
+                    if elem.base_error or elem.motif_error:
+                        self.num_of_motifs_errors += 1
 
 
 class Seq:
@@ -200,36 +200,37 @@ class Seq:
 
     def print_statistics(self, doc=None, counter=None):
         if self.contain_telo:
+            self.generate_seq()
             if doc:
                 doc.add_run("record %s contain telo, begin at %.2f" % (self.rec_num, self.telo_start / self.len) + "\n")
                 doc.add_run("length - " + str(self.len) + "\n")
             else:
                 print("record %s contain telo, begin at %.2f" % (self.rec_num, self.telo_start / self.len))
                 print("length - " + str(self.len))
+            if self.more_then_one_telo:
+                if doc:
+                    doc.add_run("2 telo or more" + "\n")
+                else:
+                    print("2 telo or more")
+            if self.telo_prefix_error:
+                if doc:
+                    doc.add_run("prefix error" + "\n")
+                else:
+                    print("prefix error")
+            telo_index = 0
+            for elem in self.seq:
+                if isinstance(elem, Telomere):
+                    if doc:
+                        doc.add_run("telo " + str(telo_index) + "\n" + "\n")
+                    else:
+                        print("telo " + str(telo_index) + "\n")
+                    elem.print_statistics(doc)
+                    telo_index += 1
+                    self.num_of_motifs_errors += elem.num_of_motifs_errors
+                    self.num_of_motifs += elem.num_of_motifs
         else:
             if counter % 50 == 0:
                 print('No telo ' + self.rec_num + '\n')
-        if self.more_then_one_telo:
-            if doc:
-                doc.add_run("2 telo or more" + "\n")
-            else:
-                print("2 telo or more")
-        if self.telo_prefix_error:
-            if doc:
-                doc.add_run("prefix error" + "\n")
-            else:
-                print("prefix error")
-        telo_index = 0
-        for elem in self.seq:
-            if isinstance(elem, Telomere):
-                if doc:
-                    doc.add_run("telo " + str(telo_index) + "\n" + "\n")
-                else:
-                    print("telo " + str(telo_index) + "\n")
-                elem.print_statistics(doc)
-                telo_index += 1
-                self.num_of_motifs_errors += elem.num_of_motifs_errors
-                self.num_of_motifs += elem.num_of_motifs
 
     def print_doc(self):
         document = Document()

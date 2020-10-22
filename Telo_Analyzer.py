@@ -53,7 +53,10 @@ def analyze_telos(teloes):
     for v, k in d_view:
         val_tot += v
     for v, k in d_view:
-        print("%s: %d %d" % (k, v, (v / val_tot) * 100))
+        percentage = (v / val_tot) * 100
+        print("%s: %d %d" % (k, v, percentage))
+        if percentage<1:
+            break
 
 if __name__ == '__main__':
     path_to_teloes = '.'
