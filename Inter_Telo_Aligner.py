@@ -7,20 +7,19 @@ SEQ_EDGE = 20
 
 MAX_ALIGN_ERR = 0.1
 
-MIN_ALIGN_LEN = 1000
+MIN_ALIGN_LEN = 500
 
 
 def alignment_between_telos(telos):
 
     for index, telo in enumerate(telos):
-        print(telo.rec_num)
+        first_print = True
         aligner = mp.Aligner(seq=telo.sequence, preset='map-ont')
         if not aligner:
             raise Exception("ERROR: failed to load/build index")
         for sub_index, align in enumerate(telos):
             if index == sub_index:
                 continue
-            is_aligned = False
             for hit in aligner.map(align.sequence):
                 if ((hit.blen > MIN_ALIGN_LEN) and ((hit.NM / hit.blen) <= MAX_ALIGN_ERR)) and hit.is_primary:
                     ref_start = hit.r_st < SEQ_EDGE
@@ -29,10 +28,11 @@ def alignment_between_telos(telos):
                     quer_end = hit.q_en > (align.len - SEQ_EDGE)
                     if (ref_start and ref_end) or (quer_start and quer_end) or (ref_start and quer_end) or (
                             ref_end and quer_start):
-                        is_aligned = True
+                        if first_print:
+                            print(telo.rec_num)
+                            first_print = False
                         print(
                             align.rec_num + " refrence : " + str(hit.r_st) + " - " + str(hit.r_en) + " query : " + str(
                                 hit.q_st) + " - " + str(hit.q_en) + " blen: " + str(hit.blen) + " NM: " + str(hit.NM))
-            if is_aligned:
-                print('\n')
-        print('\n')
+        if not first_print:
+            print('\n')

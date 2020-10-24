@@ -27,8 +27,12 @@ MIN_ALIGNMENT_LENGTH = 50
 def chromosome_matcher(hit, chromo_dict):
     handle = Entrez.efetch(db="nucleotide", id=hit.ctg, rettype="gb", retmode="text")
     lines = handle.readlines()
-    chromosome = lines[1].split("chromosome ")[1].split(", ")[0].split(" ")[0]
+    try:
+        chromosome = lines[1].split("chromosome ")[1].split(", ")[0].split(" ")[0]
+    except IndexError:
+        chromosome = "Unknown"
     print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en) + " : " + str(chromosome))
+    print('\n')
     chr_len = int(lines[0].split(" bp")[0].split(" ")[-1])
     if ('scaffold' in lines[1]) or ('patch' in lines[1]):
         chromo_dict[chromosome][UNKNOWN_INDEX] += 1
@@ -52,9 +56,10 @@ def align_to_chromosomes(teloes):
         chromosome_dict[str(i)] = [0, 0, 0]
     chromosome_dict["X"] = [0, 0, 0]
     chromosome_dict["Y"] = [0, 0, 0]
+    chromosome_dict["Unknown"] = [0, 0, 0]
 
     for telo in teloes:
-        print(telo.rec_num)
+        first_print=True
         aligns_dict = {}
         for to_align in telo.non_telomeric_parts:
             if len(to_align) < MIN_ALIGNMENT_LENGTH:
@@ -62,12 +67,14 @@ def align_to_chromosomes(teloes):
             for hit in aligner.map(to_align):
                 if hit.is_primary:
                     aligns_dict[hit.mlen] = hit
+                    if(first_print):
+                        print(telo.rec_num)
+                        first_print = False
                     print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en) + " starnd: " + str(
                         hit.strand) + " blen: " + str(hit.blen) + " mlen: " + str(hit.mlen) + " NM: " + str(hit.NM))
         if aligns_dict:
             best = aligns_dict[max(aligns_dict)]
             chromosome_matcher(best, chromosome_dict)
-        print('\n')
 
     for j in chromosome_dict:
         if (chromosome_dict[j][0] != 0) or (chromosome_dict[j][1] != 0) or (chromosome_dict[j][2] != 0):
