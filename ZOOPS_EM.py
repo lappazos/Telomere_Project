@@ -182,6 +182,7 @@ def main(path):
             continue
         file = open(os.path.join(path, filename), 'rb')
         telo = pickle.load(file)
+        file.close()
         telo.generate_seq()
         seqs.append('^' + telo.sequence + '$')
     emissions_mat, tuple, ll_history = EM(emission_mat, transition_mat, seqs, 2,
