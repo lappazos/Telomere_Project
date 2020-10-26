@@ -75,6 +75,7 @@ def EM(emissions_mat, transitions_mat, sequences, threshold, k_counter, seeds):
     dim = k_counter + td.NOT_MOTIF_STATES
     diff = np.NINF
     ll_history = []
+    first_iter = True
     while True:
         curr_diff = 0
 
@@ -124,11 +125,13 @@ def EM(emissions_mat, transitions_mat, sequences, threshold, k_counter, seeds):
         print(curr_diff)
 
         if curr_diff - diff <= threshold:
-            return emissions_mat, (
-                p_enter_telo_from_background, p_exit_telo, prob_for_primary_motif, p_same_motif_block,
-                p_exit_from_motif_to_backgroud, p_telo_background_to_motif), ll_history
-        else:
+            return emissions_mat, data, ll_history
+        elif not first_iter:
+            write_ll_history(ll_history)
+            write_motif_profile(np.exp(emissions_mat.T), data)
             diff = curr_diff
+        else:
+            pass
 
         N_kx = np.empty((dim, 0))
         for letter in alphabet:
@@ -158,6 +161,10 @@ def EM(emissions_mat, transitions_mat, sequences, threshold, k_counter, seeds):
                                                      p_exit_from_motif_to_backgroud=np.exp(
                                                          p_exit_from_motif_to_backgroud),
                                                      p_telo_background_to_motif=np.exp(p_telo_background_to_motif))
+        data = (
+            p_enter_telo_from_background, p_exit_telo, prob_for_primary_motif, p_same_motif_block,
+            p_exit_from_motif_to_backgroud, p_telo_background_to_motif)
+        first_iter = False
 
 
 def main(path):
@@ -170,19 +177,19 @@ def main(path):
 
     emission_mat, k_counter = td.initial_emissions_mat_calc(seeds, alpha=(0.08 / 3))
     transition_mat = td.build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=0.1,
-                                             p_exit_telo=0.0002,
-                                             p_end_of_seq=0.00005, prob_for_primary_motif=0.8,
-                                             p_same_motif_block=0.65,
-                                             p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
+                                                p_exit_telo=0.0002,
+                                                p_end_of_seq=0.00005, prob_for_primary_motif=0.8,
+                                                p_same_motif_block=0.65,
+                                                p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
 
     seqs = []
     for folder in os.listdir(path):
-        if os.path.isdir(os.path.join(path,folder,'cluster')):
-            for filename in os.listdir(os.path.join(path,folder,'cluster')):
+        if os.path.isdir(os.path.join(path, folder, 'cluster')):
+            for filename in os.listdir(os.path.join(path, folder, 'cluster')):
                 _, file_extension = os.path.splitext(filename)
                 if file_extension != '.obj':
                     continue
-                file = open(os.path.join(path,folder,'cluster', filename), 'rb')
+                file = open(os.path.join(path, folder, 'cluster', filename), 'rb')
                 telo = pickle.load(file)
                 file.close()
                 telo.generate_seq()
