@@ -176,16 +176,18 @@ def main(path):
                                              p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
 
     seqs = []
-    for filename in os.listdir(path):
-        _, file_extension = os.path.splitext(filename)
-        if file_extension != '.obj':
-            continue
-        file = open(os.path.join(path, filename), 'rb')
-        telo = pickle.load(file)
-        file.close()
-        telo.generate_seq()
-        seqs.append('^' + telo.sequence + '$')
-    emissions_mat, tuple, ll_history = EM(emission_mat, transition_mat, seqs, 2,
+    for folder in os.listdir(path):
+        if os.path.isdir(os.path.join(path,folder,'cluster')):
+            for filename in os.listdir(os.path.join(path,folder,'cluster')):
+                _, file_extension = os.path.splitext(filename)
+                if file_extension != '.obj':
+                    continue
+                file = open(os.path.join(path,folder,'cluster', filename), 'rb')
+                telo = pickle.load(file)
+                file.close()
+                telo.generate_seq()
+                seqs.append('^' + telo.sequence + '$')
+    emissions_mat, tuple, ll_history = EM(emission_mat, transition_mat, seqs, 3,
                                           k_counter, seeds)
     write_ll_history(ll_history)
     write_motif_profile(np.exp(emissions_mat.T), tuple)
