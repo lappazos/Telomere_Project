@@ -1,9 +1,10 @@
-import pickle
-import Seq
 import os
+
 import matplotlib.pyplot as plt
-from Telomere_DNA_Aligner import align_to_chromosomes
+
 from Inter_Telo_Aligner import alignment_between_telos
+from Seq import *
+from Telomere_DNA_Aligner import align_to_chromosomes
 
 MIN_SEQ_LEN_TO_PRINT = 150
 
@@ -59,17 +60,27 @@ def analyze_telos(teloes):
             break
 
 if __name__ == '__main__':
-    path_to_teloes = '.'
+    path_to_teloes = '../'
     teloes = []
-    for filename in os.listdir(path_to_teloes):
-        _, file_extension = os.path.splitext(filename)
-        if file_extension != '.obj':
-            continue
-        file = open(os.path.join(path_to_teloes, filename), 'rb')
-        telo = pickle.load(file)
-        file.close()
-        telo.generate_seq()
-        teloes.append(telo)
+    for folder in os.listdir(path_to_teloes):
+        if os.path.isdir(os.path.join(path_to_teloes, folder, 'cluster')):
+            for filename in os.listdir(os.path.join(path_to_teloes, folder, 'cluster')):
+                _, file_extension = os.path.splitext(filename)
+                if file_extension != '.obj':
+                    continue
+                file = open(os.path.join(path_to_teloes, folder, 'cluster', filename), 'rb')
+                telo = pickle.load(file)
+                file.close()
+                telo.generate_seq()
+                if telo.more_then_one_telo:
+                    continue
+                for elem in telo.seq:
+                    if isinstance(elem, Telomere):
+                        if elem.num_of_motifs <= 25:
+                            continue
+                        if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[2] > 0.79):
+                            continue
+                teloes.append(telo)
     print("Telo_Analyzer")
     print("--------------------------------------------------------------------")
     analyze_telos(teloes)
