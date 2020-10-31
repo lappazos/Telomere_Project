@@ -80,13 +80,13 @@ if __name__ == '__main__':
                     if isinstance(elem, Telomere):
                         if elem.num_of_motifs <= 25:
                             add = False
-                        if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[2] > 0.79):
+                        if (25 < elem.num_of_motifs <= 275) and (elem.motif_types_num[1] > 0.79):
                             add = False
                 if add:
                     teloes.append(telo)
     print("Telo_Analyzer")
     print("--------------------------------------------------------------------")
-    # analyze_telos(teloes)
+    analyze_telos(teloes)
     print("--------------------------------------------------------------------")
     print('\n')
     print("Telomere_DNA_Aligner")

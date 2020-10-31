@@ -3,6 +3,7 @@ import numpy as np
 from scipy.special import logsumexp
 import os
 import pickle
+from Seq import Telomere
 
 TELO_PATH = '.'
 
@@ -49,7 +50,7 @@ def write_motif_profile(emissions_mat, tuple):
     :param q: final q
     :param p: final p
     """
-    np.savetxt('motif_profile.txt', emissions_mat[1:-1, 2:-2], fmt='%.2f', delimiter='\t')
+    np.savetxt('motif_profile.txt', emissions_mat[1:-1, 1:-1], fmt='%.2f', delimiter='\t')
     f = open('motif_profile.txt', 'a')
     p_enter_telo_from_background, p_exit_telo, prob_for_primary_motif, p_same_motif_block, p_exit_from_motif_to_backgroud, p_telo_background_to_motif = np.exp(
         tuple)
@@ -183,9 +184,19 @@ def main(path):
                                                 p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
 
     seqs = []
+    parse_dir('HH', seqs)
+    parse_dir('Normal', seqs)
+    emissions_mat, tuple, ll_history = EM(emission_mat, transition_mat, seqs, 3,
+                                          k_counter, seeds)
+    write_ll_history(ll_history)
+    write_motif_profile(np.exp(emissions_mat.T), tuple)
+
+
+def parse_dir(path, seqs):
     for folder in os.listdir(path):
         if os.path.isdir(os.path.join(path, folder, 'cluster')):
             for filename in os.listdir(os.path.join(path, folder, 'cluster')):
+                add = True
                 _, file_extension = os.path.splitext(filename)
                 if file_extension != '.obj':
                     continue
@@ -193,11 +204,16 @@ def main(path):
                 telo = pickle.load(file)
                 file.close()
                 telo.generate_seq()
-                seqs.append('^' + telo.sequence + '$')
-    emissions_mat, tuple, ll_history = EM(emission_mat, transition_mat, seqs, 3,
-                                          k_counter, seeds)
-    write_ll_history(ll_history)
-    write_motif_profile(np.exp(emissions_mat.T), tuple)
+                if telo.more_then_one_telo:
+                    continue
+                for elem in telo.seq:
+                    if isinstance(elem, Telomere):
+                        if elem.num_of_motifs <= 25:
+                            add = False
+                        if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[2] > 0.79):
+                            add = False
+                if add:
+                    seqs.append('^' + telo.sequence + '$')
 
 
 if __name__ == "__main__":

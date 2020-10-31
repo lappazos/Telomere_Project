@@ -29,7 +29,7 @@ NUM_OF_BASES = 4
 
 base_dict = {START_SIGN: 0, "A": 1, "C": 2, "G": 3, "T": 4, END_SIGN: 5}
 
-DNA_PROBABILITY = [0.22, 0.28, 0.28, 0.22]
+DNA_PROBABILITY = [0.3, 0.2, 0.2, 0.3]
 
 
 def initial_emissions_mat_calc(seeds, alpha):
