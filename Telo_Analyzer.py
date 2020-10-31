@@ -48,6 +48,7 @@ def analyze_telos(teloes):
     plt.ylabel('# Reads')
     # plt.show()
     plt.savefig('Sub_Telomere_length.jpg')
+    plt.close()
     d_view = [(v, k) for k, v in motif_dic.items()]
     d_view.sort(reverse=True)  # natively sort tuples by first element
     val_tot = 0
@@ -85,7 +86,7 @@ if __name__ == '__main__':
                     teloes.append(telo)
     print("Telo_Analyzer")
     print("--------------------------------------------------------------------")
-    analyze_telos(teloes)
+    # analyze_telos(teloes)
     print("--------------------------------------------------------------------")
     print('\n')
     print("Telomere_DNA_Aligner")

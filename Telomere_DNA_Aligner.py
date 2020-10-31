@@ -25,7 +25,7 @@ Entrez.email = "Your.Name.Here@example.org"
 MIN_ALIGNMENT_LENGTH = 50
 
 
-def chromosome_matcher(hit, chromo_dict,chromosome_graph):
+def chromosome_matcher(hit, chromo_dict,chromosome_graph,telo_length,chromo_count):
     handle = Entrez.efetch(db="nucleotide", id=hit.ctg, rettype="gb", retmode="text")
     lines = handle.readlines()
     try:
@@ -39,14 +39,25 @@ def chromosome_matcher(hit, chromo_dict,chromosome_graph):
         chromosome_graph[chromosome].append(hit.r_st/chr_len)
     if ('scaffold' in lines[1]) or ('patch' in lines[1]):
         chromo_dict[chromosome][UNKNOWN_INDEX] += 1
+        chromo_count[1][0] +=1
+        chromo_count[1][1] +=telo_length
+        handle.close()
         return
     elif hit.r_st < chr_len * CHR_BEGIN:
         chromo_dict[chromosome][BEGIN_INDEX] += 1
+        chromo_count[0][0] += 1
+        chromo_count[0][1] += telo_length
+        handle.close()
         return
     elif hit.r_en > chr_len * CHR_END:
         chromo_dict[chromosome][END_INDEX] += 1
+        chromo_count[0][0] += 1
+        chromo_count[0][1] += telo_length
+        handle.close()
         return
     chromo_dict[chromosome][UNKNOWN_INDEX] += 1
+    chromo_count[1][0] += 1
+    chromo_count[1][1] += telo_length
     handle.close()
 
 
@@ -65,6 +76,7 @@ def align_to_chromosomes(teloes):
     chromosome_graph["Y"] = []
     chromosome_dict["Unknown"] = [0, 0, 0]
     chromosome_graph["Unknown"] = []
+    chromo_count = [[0,0],[0,0]]
 
     for telo in teloes:
         first_print=True
@@ -82,7 +94,7 @@ def align_to_chromosomes(teloes):
                         hit.strand) + " blen: " + str(hit.blen) + " mlen: " + str(hit.mlen) + " NM: " + str(hit.NM))
         if aligns_dict:
             best = aligns_dict[max(aligns_dict)]
-            chromosome_matcher(best, chromosome_dict,chromosome_graph)
+            chromosome_matcher(best, chromosome_dict,chromosome_graph,telo.longest_telomere_len,chromo_count)
 
     for j in chromosome_dict:
         if (chromosome_dict[j][0] != 0) or (chromosome_dict[j][1] != 0) or (chromosome_dict[j][2] != 0):
@@ -94,4 +106,7 @@ def align_to_chromosomes(teloes):
             plt.plot(dot, 0.5, 'ro')
         plt.savefig('Chromosome_'+chromosome+'.jpg')
         plt.close()
+
+    print("Average telo legth on edges - "+str(chromo_count[0][1]/chromo_count[0][0])+"\n")
+    print("Average telo legth in center - "+str(chromo_count[1][1]/chromo_count[1][0])+"\n")
 
