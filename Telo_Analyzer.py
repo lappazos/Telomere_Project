@@ -65,6 +65,7 @@ if __name__ == '__main__':
     for folder in os.listdir(path_to_teloes):
         if os.path.isdir(os.path.join(path_to_teloes, folder, 'cluster')):
             for filename in os.listdir(os.path.join(path_to_teloes, folder, 'cluster')):
+                add = True
                 _, file_extension = os.path.splitext(filename)
                 if file_extension != '.obj':
                     continue
@@ -77,10 +78,11 @@ if __name__ == '__main__':
                 for elem in telo.seq:
                     if isinstance(elem, Telomere):
                         if elem.num_of_motifs <= 25:
-                            continue
+                            add = False
                         if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[2] > 0.79):
-                            continue
-                teloes.append(telo)
+                            add = False
+                if add:
+                    teloes.append(telo)
     print("Telo_Analyzer")
     print("--------------------------------------------------------------------")
     analyze_telos(teloes)
@@ -93,4 +95,4 @@ if __name__ == '__main__':
     print('\n')
     print("Inter_Telo_Aligner")
     print("--------------------------------------------------------------------")
-    alignment_between_telos(teloes)
+    # alignment_between_telos(teloes)
