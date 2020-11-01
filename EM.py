@@ -210,7 +210,7 @@ def parse_dir(path, seqs):
                     if isinstance(elem, Telomere):
                         if elem.num_of_motifs <= 25:
                             add = False
-                        if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[2] > 0.79):
+                        if (25 < elem.num_of_motifs < 275) and (elem.motif_types_num[1] > 0.79):
                             add = False
                 if add:
                     seqs.append('^' + telo.sequence + '$')

@@ -34,6 +34,7 @@ def analyze_telos(teloes):
                 motif_dic[motif] += telo.motif_dict[motif]
             else:
                 motif_dic[motif] = telo.motif_dict[motif]
+    print("average telo len is "+str(sum(telos_lengths) / len(telos_lengths)) )
     plt.hist(telos_lengths, bins=50, color='orange')
     # plt.xscale('log')
     plt.title('Telomere length')

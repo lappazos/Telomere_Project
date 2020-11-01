@@ -16,6 +16,7 @@ END_INDEX = 2
 
 BEGIN_INDEX = 1
 
+
 CHR_END = 0.97
 
 CHR_BEGIN = 0.03
@@ -35,27 +36,29 @@ def chromosome_matcher(hit, chromo_dict,chromosome_graph,telo_length,chromo_coun
     print(hit.ctg + " : " + str(hit.r_st) + " - " + str(hit.r_en) + " : " + str(chromosome))
     print('\n')
     chr_len = int(lines[0].split(" bp")[0].split(" ")[-1])
-    if hit.r_st >0 and chr_len > 0:
-        chromosome_graph[chromosome].append(hit.r_st/chr_len)
+    if hit.r_st <0 or chr_len < 0 or hit.r_st > chr_len:
+        return
+    strand = 1 if hit.strand ==1 else 0
+    chromosome_graph[chromosome][strand].append(hit.r_st/chr_len)
     if ('scaffold' in lines[1]) or ('patch' in lines[1]):
-        chromo_dict[chromosome][UNKNOWN_INDEX] += 1
+        chromo_dict[chromosome][strand][UNKNOWN_INDEX] += 1
         chromo_count[1][0] +=1
         chromo_count[1][1] +=telo_length
         handle.close()
         return
     elif hit.r_st < chr_len * CHR_BEGIN:
-        chromo_dict[chromosome][BEGIN_INDEX] += 1
+        chromo_dict[chromosome][strand][BEGIN_INDEX] += 1
         chromo_count[0][0] += 1
         chromo_count[0][1] += telo_length
         handle.close()
         return
     elif hit.r_en > chr_len * CHR_END:
-        chromo_dict[chromosome][END_INDEX] += 1
+        chromo_dict[chromosome][strand][END_INDEX] += 1
         chromo_count[0][0] += 1
         chromo_count[0][1] += telo_length
         handle.close()
         return
-    chromo_dict[chromosome][UNKNOWN_INDEX] += 1
+    chromo_dict[chromosome][strand][UNKNOWN_INDEX] += 1
     chromo_count[1][0] += 1
     chromo_count[1][1] += telo_length
     handle.close()
@@ -68,14 +71,14 @@ def align_to_chromosomes(teloes):
     chromosome_dict = {}
     chromosome_graph = {}
     for i in range(1, NUM_CHROMOSOMES + 1):
-        chromosome_dict[str(i)] = [0, 0, 0]
-        chromosome_graph[str(i)] = []
-    chromosome_dict["X"] = [0, 0, 0]
-    chromosome_graph["X"] = []
-    chromosome_dict["Y"] = [0, 0, 0]
-    chromosome_graph["Y"] = []
-    chromosome_dict["Unknown"] = [0, 0, 0]
-    chromosome_graph["Unknown"] = []
+        chromosome_dict[str(i)] = [[0, 0, 0],[0, 0, 0]]
+        chromosome_graph[str(i)] = [[],[]]
+    chromosome_dict["X"] = [[0, 0, 0],[0, 0, 0]]
+    chromosome_graph["X"] = [[],[]]
+    chromosome_dict["Y"] = [[0, 0, 0],[0, 0, 0]]
+    chromosome_graph["Y"] = [[],[]]
+    chromosome_dict["Unknown"] = [[0, 0, 0],[0, 0, 0]]
+    chromosome_graph["Unknown"] = [[],[]]
     chromo_count = [[0,0],[0,0]]
 
     for telo in teloes:
@@ -101,9 +104,14 @@ def align_to_chromosomes(teloes):
             print(j + " " + str(chromosome_dict[j]))
 
     for chromosome in chromosome_graph:
-        plt.axhline(y=0.5, color='b', linestyle='-')
-        for dot in chromosome_graph[chromosome]:
-            plt.plot(dot, 0.5, 'ro')
+        plt.axhline(y=1, color='b', linestyle='-')
+        plt.axhline(y=0, color='b', linestyle='-')
+        plt.axhline(y=8, color='b', linestyle='-')
+        plt.axhline(y=-7, color='b', linestyle='-')
+        for dot in chromosome_graph[chromosome][1]:
+            plt.plot(dot, 0, 'ro')
+        for dot in chromosome_graph[chromosome][0]:
+            plt.plot(dot, 1, 'ro')
         plt.savefig('Chromosome_'+chromosome+'.jpg')
         plt.close()
 
