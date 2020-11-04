@@ -18,7 +18,6 @@ def analyze_telos(teloes):
     subtelos_length = []
     motif_dic = {}
     for telo in teloes:
-        # print(telo.rec_num)
         if telo.longest_telomere_len > MIN_TELO_LENGTH:
             telos_lengths.append(telo.longest_telomere_len)
             if telo.non_telomeric_parts:
@@ -61,30 +60,28 @@ def analyze_telos(teloes):
         if percentage<1:
             break
 
-if __name__ == '__main__':
-    path_to_teloes = '../'
+def analyzer():
+    path_to_teloes = '.'
     teloes = []
-    for folder in os.listdir(path_to_teloes):
-        if os.path.isdir(os.path.join(path_to_teloes, folder, 'cluster')):
-            for filename in os.listdir(os.path.join(path_to_teloes, folder, 'cluster')):
-                add = True
-                _, file_extension = os.path.splitext(filename)
-                if file_extension != '.obj':
-                    continue
-                file = open(os.path.join(path_to_teloes, folder, 'cluster', filename), 'rb')
-                telo = pickle.load(file)
-                file.close()
-                telo.generate_seq()
-                if telo.more_then_one_telo:
-                    continue
-                for elem in telo.seq:
-                    if isinstance(elem, Telomere):
-                        if elem.num_of_motifs <= 25:
-                            add = False
-                        if (25 < elem.num_of_motifs <= 275) and (elem.motif_types_num[1] > 0.79):
-                            add = False
-                if add:
-                    teloes.append(telo)
+    for filename in os.listdir(path_to_teloes):
+        add = True
+        _, file_extension = os.path.splitext(filename)
+        if file_extension != '.obj':
+            continue
+        file = open(os.path.join(path_to_teloes, filename), 'rb')
+        telo = pickle.load(file)
+        file.close()
+        telo.generate_seq()
+        if telo.more_then_one_telo:
+            continue
+        for elem in telo.seq:
+            if isinstance(elem, Telomere):
+                if elem.num_of_motifs <= 25:
+                    add = False
+                if (25 < elem.num_of_motifs <= 275) and (elem.motif_types_num[1] > 0.79):
+                    add = False
+        if add:
+            teloes.append(telo)
     print("Telo_Analyzer")
     print("--------------------------------------------------------------------")
     analyze_telos(teloes)
@@ -97,4 +94,4 @@ if __name__ == '__main__':
     print('\n')
     print("Inter_Telo_Aligner")
     print("--------------------------------------------------------------------")
-    # alignment_between_telos(teloes)
+    alignment_between_telos(teloes)

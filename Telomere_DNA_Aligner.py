@@ -40,6 +40,7 @@ def chromosome_matcher(hit, chromo_dict,chromosome_graph,telo_length,chromo_coun
         return
     strand = 1 if hit.strand ==1 else 0
     chromosome_graph[chromosome][strand].append(hit.r_st/chr_len)
+    print('chromosome '+str(chromosome)+' strand '+str(strand) +' relative location  '+str(hit.r_st/chr_len))
     if ('scaffold' in lines[1]) or ('patch' in lines[1]):
         chromo_dict[chromosome][strand][UNKNOWN_INDEX] += 1
         chromo_count[1][0] +=1

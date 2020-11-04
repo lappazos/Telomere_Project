@@ -1,10 +1,10 @@
-import time
 import numpy as np
 from scipy.special import logsumexp
 from Seq import *
 from Bio.SeqIO import parse
 import os
 import sys
+from Telo_Analyzer import analyzer
 
 FASTQ_PATH = '../fastq'
 
@@ -300,16 +300,16 @@ def main(fastq_files_path):
     seeds = ['TTAGGG', 'TTAAAA', 'TTGGGG']
 
     emission_mat, k_counter = initial_emissions_mat_calc(seeds, alpha=(0.08 / 3))
-    transition_mat = build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=0.1,
+    transition_mat = build_transition_matrix(seeds, telo_in_seq=0.0005, p_enter_telo_from_background=0.07,
                                              p_exit_telo=0.0002,
-                                             p_end_of_seq=0.00005, prob_for_primary_motif=0.8,
-                                             p_same_motif_block=0.65,
-                                             p_exit_from_motif_to_backgroud=0.25, p_telo_background_to_motif=0.6)
+                                             p_end_of_seq=0.00005, prob_for_primary_motif=0.7,
+                                             p_same_motif_block=0.64,
+                                             p_exit_from_motif_to_backgroud=0.3, p_telo_background_to_motif=0.55)
 
     files_visited = []
 
     for filename in os.listdir(fastq_files_path):
-        file_num = int(filename.split("_")[1].split(".")[0])
+        file_num = int(filename.split("_")[-1].split(".")[0])
         if not (int(sys.argv[1]) <= file_num < int(sys.argv[2])):
             continue
         path = os.path.join(fastq_files_path, filename)
@@ -327,7 +327,5 @@ def main(fastq_files_path):
 
 
 if __name__ == '__main__':
-    start = time.time()
     main(FASTQ_PATH)
-    end = time.time()
-    print("time:" + str(end - start))
+    # analyzer()
